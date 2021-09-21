@@ -1,9 +1,7 @@
-from socket import socket
 import cv2 #Opencv
 import mediapipe as mp #Google
 import math 
 import pafy 
-import Socket
 
 class AnalisisFacial:
     def __init__(self,entrada) :
@@ -13,16 +11,19 @@ class AnalisisFacial:
         else: 
             #Se usa para hacer video streaming de una url de youtube
             url="https://www.youtube.com/watch?v=j6eGHROLKP8&t=17s&ab_channel=RingaTech"
+            #Consigue metadatos de un video de youtube (url, vistas, usuario etc)
             video=pafy.new(url)
-            best=video.getbest(preftype="mp4")
-
+            datosVideo=video.getbest(preftype="mp4")
+            #Iniciamos captura
             captura =cv2.VideoCapture()
-            captura.open(best.url)
-        objetoSocket=Socket.Socket()
-        #Iniciamos la funcion de dibujo de la mallafacial de mediapipe
-        mediapDibujo=mp.solutions.drawing_utils
-        #Asignamos grosor a las lineas de la mallafacial
-        configuracionDibujo=mediapDibujo.DrawingSpec(thickness=1,circle_radius=1,color=(0,255,255))
+            #Abrimos la ubicacion del video
+            captura.open(datosVideo.url)
+            #print(datosVideo.url)
+
+        #Creamos un objeto donde almacenar los puntos faciales de mediapipe
+        mediapDibujoPuntos=mp.solutions.drawing_utils
+        #Asignamos valores a los puntos 
+        configuracionDibujoPuntos=mediapDibujoPuntos.DrawingSpec(thickness=1,circle_radius=1,color=(0,255,255))
 
         #Creamos un objeto donde almacenar la malla facial
         mediapMallaFacial=mp.solutions.face_mesh
@@ -31,54 +32,52 @@ class AnalisisFacial:
 
         while True:
 
-            #Lectura de frame y el estado
+            #Lectura de frame y el estado (En Python puedo asignar datos a variables de la siguiente forma var1,var2=1,2) 
             estado,frame=captura.read()
-            
+
             #Procesa el fotograma para entreganos la malla facial
             resultados=mallaFacial.process(frame)
 
-            vectorPuntosFaciales=[]
+            listaPuntosFaciales=[]
 
             #Si encuentra un rostro        
             if resultados.multi_face_landmarks:
                 #Para todos los rostros detectados
                 for rostros in resultados.multi_face_landmarks:
                     #Dibujamos las conecciones de la malla
-                    mediapDibujo.draw_landmarks(frame,rostros,mediapMallaFacial.FACEMESH_CONTOURS,configuracionDibujo,configuracionDibujo)
+                    mediapDibujoPuntos.draw_landmarks(frame,rostros,mediapMallaFacial.FACEMESH_CONTOURS,configuracionDibujoPuntos,configuracionDibujoPuntos)
                     #Puntos rostro detectado
-                    for punto,puntos in enumerate (rostros.landmark):
+                    for puntoID,puntos in enumerate (rostros.landmark):
                         #Alto y ancho de la ventana
                         altoVentana, anchoVentana,variable=frame.shape
         
                         posx=int(puntos.x*anchoVentana)
                         posy=int(puntos.y*altoVentana)
-                        #print("--------")
                         #print(f"{altoVentana},{anchoVentana}, {c}")
-                        #print(f"{x}, {y}")
-                        
-                        vectorPuntosFaciales.append([punto,posx,posy])
-                        #print(len(lista))
-                        if len(vectorPuntosFaciales)==468:
-                            x1Boca,y1Boca=vectorPuntosFaciales[13][1:]
-                            x2Boca,y2Boca=vectorPuntosFaciales[14][1:]
+                        #Apilamos los puntos faciales en una lista con sus coordenadas
+                        listaPuntosFaciales.append([puntoID,posx,posy])
+                        if len(listaPuntosFaciales)==468:
+                            #Segun el identificador tomamos coordenadas en x,y ([n:] desde la posicion n en adelante)
+                            x1Boca,y1Boca=listaPuntosFaciales[13][1:]
+                            x2Boca,y2Boca=listaPuntosFaciales[14][1:]
                             #Devuelve la norma de un vector es decir distancia entre dos puntos
                             longitudBoca=math.hypot(x2Boca-x1Boca,y2Boca-y1Boca)
                             print(f"Longitud Boca:{longitudBoca}")
-                            x1OjoIzquierdo,y1OjoIzquierdo=vectorPuntosFaciales[159][1:]
-                            x2OjoIzquierdo,y2OjoIzquierdo=vectorPuntosFaciales[145][1:]
+                            x1OjoIzquierdo,y1OjoIzquierdo=listaPuntosFaciales[159][1:]
+                            x2OjoIzquierdo,y2OjoIzquierdo=listaPuntosFaciales[145][1:]
                             #Devuelve la norma de un vector es decir distancia entre dos puntos
                             longitudOjoIzquierdo=math.hypot(x2OjoIzquierdo-x1OjoIzquierdo,y2OjoIzquierdo-y1OjoIzquierdo)
                             print(f"Longitud Ojo Izquierdo:{longitudOjoIzquierdo}")
-                            x1OjoDerecho,y1OjoDerecho=vectorPuntosFaciales[374][1:]
-                            x2OjoDerecho,y2OjoDerecho=vectorPuntosFaciales[386][1:]
+                            x1OjoDerecho,y1OjoDerecho=listaPuntosFaciales[374][1:]
+                            x2OjoDerecho,y2OjoDerecho=listaPuntosFaciales[386][1:]
                             #Devuelve la norma de un vector es decir distancia entre dos puntos
                             longitudOjoDerecho=math.hypot(x2OjoDerecho-x1OjoDerecho,y2OjoDerecho-y1OjoDerecho)
                             print(f"Longitud Ojo Derecho:{longitudOjoDerecho}")
                                        
             cv2.imshow("Frame",frame)
-            t=cv2.waitKey(1)
-            if t==27:
+            #Escape para cerrar frame
+            tecla=cv2.waitKey(1)
+            if tecla==27:
                 break
-
-        captura.relase()
+        #Destruimos cada ventana creada por opencv 
         cv2.destroyAllWindows()   
