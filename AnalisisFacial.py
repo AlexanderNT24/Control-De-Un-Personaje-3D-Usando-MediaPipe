@@ -1,25 +1,24 @@
+from socket import socket
 import cv2 #Opencv
 import mediapipe as mp #Google
 import math 
 import pafy 
+import Socket
 
 class AnalisisFacial:
-    def __init__(self) :
-                
-        #Capturo el streaming de la webcam de el puerto de la webcam (0 para la nativa)
-        #captura=cv2.VideoCapture(1)
+    def __init__(self,entrada) :
+        if entrada=="1":        
+            #Capturo el streaming de la webcam de el puerto de la webcam (0 para la nativa y 1,2.. para externas)
+            captura=cv2.VideoCapture(1)
+        else: 
+            #Se usa para hacer video streaming de una url de youtube
+            url="https://www.youtube.com/watch?v=j6eGHROLKP8&t=17s&ab_channel=RingaTech"
+            video=pafy.new(url)
+            best=video.getbest(preftype="mp4")
 
-        #Se usa para hacer video streaming de una url de youtube
-        #'''''
-        url="https://www.youtube.com/watch?v=j6eGHROLKP8&t=17s&ab_channel=RingaTech"
-        video=pafy.new(url)
-        best=video.getbest(preftype="mp4")
-
-        captura =cv2.VideoCapture()
-        captura.open(best.url)
-        #'''''
-
-
+            captura =cv2.VideoCapture()
+            captura.open(best.url)
+        objetoSocket=Socket.Socket()
         #Iniciamos la funcion de dibujo de la mallafacial de mediapipe
         mediapDibujo=mp.solutions.drawing_utils
         #Asignamos grosor a las lineas de la mallafacial
@@ -32,9 +31,9 @@ class AnalisisFacial:
 
         while True:
 
-            #Lectura de frame
-            ret,frame=captura.read()
-
+            #Lectura de frame y el estado
+            estado,frame=captura.read()
+            
             #Procesa el fotograma para entreganos la malla facial
             resultados=mallaFacial.process(frame)
 
@@ -69,7 +68,7 @@ class AnalisisFacial:
                             x2OjoIzquierdo,y2OjoIzquierdo=vectorPuntosFaciales[145][1:]
                             #Devuelve la norma de un vector es decir distancia entre dos puntos
                             longitudOjoIzquierdo=math.hypot(x2OjoIzquierdo-x1OjoIzquierdo,y2OjoIzquierdo-y1OjoIzquierdo)
-                            print(f"Longitud Ojo Derecho:{longitudOjoIzquierdo}")
+                            print(f"Longitud Ojo Izquierdo:{longitudOjoIzquierdo}")
                             x1OjoDerecho,y1OjoDerecho=vectorPuntosFaciales[374][1:]
                             x2OjoDerecho,y2OjoDerecho=vectorPuntosFaciales[386][1:]
                             #Devuelve la norma de un vector es decir distancia entre dos puntos

@@ -10,3 +10,6 @@ https://google.github.io/mediapipe/solutions/face_mesh.html
 
 Sockets
 https://docs.python.org/es/3/howto/sockets.html
+ - Encode y Decode
+   https://docs.python.org/3/library/codecs.html
+

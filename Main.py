@@ -2,7 +2,8 @@ import AnalisisFacial
 
 
 def main():
-    objetoAnalisisFacial=AnalisisFacial.AnalisisFacial()
+    entrada=input("Entrada video:")
+    objetoAnalisisFacial=AnalisisFacial.AnalisisFacial(entrada)
 
 if __name__ == "__main__":
     main()
