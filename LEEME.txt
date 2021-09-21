@@ -1,0 +1,12 @@
+El proyecto se basa en la creación de un personaje 3D que es controlado con inteligencia artificial, esto con la ayuda de la libreria mediapipe, la cual reconoce y brinda puntos especiales en un rostro. 
+
+Links importantes:
+
+Main python
+https://www.freecodecamp.org/espanol/news/python-if-name-main/
+
+Mediapipe
+https://google.github.io/mediapipe/solutions/face_mesh.html
+
+Sockets
+https://docs.python.org/es/3/howto/sockets.html
