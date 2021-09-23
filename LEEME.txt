@@ -13,3 +13,10 @@ https://docs.python.org/es/3/howto/sockets.html
  - Encode y Decode
    https://docs.python.org/3/library/codecs.html
 
+POO Python:
+https://www.tutorialesprogramacionya.com/pythonya/detalleconcepto.php?punto=45&codigo=45&inicio=30
+https://www.delftstack.com/es/howto/python/self-in-python/
+
+Pafy:
+https://pypi.org/project/pafy/
+
