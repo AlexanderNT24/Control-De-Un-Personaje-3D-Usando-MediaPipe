@@ -1,14 +1,20 @@
 import cv2 #Opencv
 import mediapipe as mp #Google
 import math 
-import pafy 
+
+from Captura import Captura
+from MallaFacial import MallaFacial
+
 
 class AnalisisFacial:
 
-    def __init__(self,entrada) :  
-        captura=self.getCaptura(entrada)
-        mediapDibujoPuntos,dibujoPuntos=self.getPuntosMallaFacial()
-        mediapMallaFacial,mallaFacial=self.getMallaFacial()
+    def __init__(self,tipoEntrada) :  
+        objetoCaptura=Captura()
+        objetoCaptura.setTipoEntrada(tipoEntrada)
+        captura=objetoCaptura.getCaptura()
+        objetoMallaFacial=MallaFacial()
+        mediapMallaFacial,mallaFacial=objetoMallaFacial.getMallaFacial()
+        mediapDibujoPuntos,dibujoPuntos=objetoMallaFacial.getPuntosMallaFacial()
         self.analisisVideo(captura,mediapDibujoPuntos,dibujoPuntos,mediapMallaFacial,mallaFacial)
 
     def analisisVideo(self,captura,mediapDibujoPuntos,dibujoPuntos,mediapMallaFacial,mallaFacial):
@@ -33,7 +39,7 @@ class AnalisisFacial:
                         #Apilamos los puntos faciales en una lista con sus coordenadas
                         listaPuntosFaciales.append([puntoID,posx,posy])
                         if len(listaPuntosFaciales)==468:
-                            longitudes=self.getLongitudes(listaPuntosFaciales)
+                            self.getLongitudes(listaPuntosFaciales)
         
             cv2.imshow("Frame",frame)
             #Codigo Ascii ESC es 27 para cerrar frame
@@ -41,20 +47,6 @@ class AnalisisFacial:
                 break
         #Destruimos cada ventana creada por opencv 
         cv2.destroyAllWindows() 
-
-    def getPuntosMallaFacial(self):
-        #Creamos un objeto donde almacenar los puntos faciales de mediapipe
-        mediapDibujoPuntos=mp.solutions.drawing_utils
-        #Asignamos valores a los puntos 
-        puntosMalla=mediapDibujoPuntos.DrawingSpec(thickness=1,circle_radius=1,color=(0,255,255))
-        return mediapDibujoPuntos,puntosMalla
-
-    def getMallaFacial(self):
-        #Creamos un objeto donde almacenar la malla facial
-        mediapMallaFacial=mp.solutions.face_mesh
-        #Creamos el objeto de la malla facial
-        mallaFacial=mediapMallaFacial.FaceMesh()
-        return mediapMallaFacial,mallaFacial
 
     def getLongitudes(self,listaPuntosFaciales):
         #Segun el identificador tomamos coordenadas en x,y ([n:] desde la posicion n en adelante)
@@ -77,23 +69,6 @@ class AnalisisFacial:
         print(f"Longitudes: Boca({longitudes[0]}) Ojo Izquierdo({longitudes[1]}) Ojo Derecho({longitudes[2]})")
         return longitudes
 
-    def getCaptura(self,entrada):
-        if entrada=="1":        
-            #Capturo el streaming de la webcam de el puerto de la webcam (0 para la nativa y 1,2.. para externas)
-            captura=cv2.VideoCapture(0)
-            return captura
-        else: 
-            #Se usa para hacer video streaming de una url de youtube
-            url="https://www.youtube.com/watch?v=j6eGHROLKP8&t=17s&ab_channel=RingaTech"
-            #Consigue metadatos de un video de youtube (url, vistas, usuario etc)
-            video=pafy.new(url)
-            datosVideo=video.getbest(preftype="mp4")
-            #Iniciamos captura
-            captura =cv2.VideoCapture()
-            #Abrimos la ubicacion del video
-            captura.open(datosVideo.url)
-            #print(datosVideo.url)
-            return captura
-            
+
 
         
