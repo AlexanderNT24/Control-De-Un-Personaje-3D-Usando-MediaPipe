@@ -1,12 +1,15 @@
 import cv2 #Opencv
 import mediapipe as mp #Google
+import time
 
 from Captura import Captura
 from MallaFacial import MallaFacial
 from AnalisisFacial import AnalisisFacial
+from Conexion import Conexion
 
 def main():
-    tipoEntrada=input("Entrada video:")
+    #tipoEntrada=input("Entrada video:")
+    tipoEntrada="streaming"
     objetoCaptura=Captura(tipoEntrada)
     captura=objetoCaptura.getCaptura()
 
@@ -38,9 +41,12 @@ def analisisVideo(captura,mediapDibujoPuntos,dibujoPuntos,mediapMallaFacial,mall
                     listaPuntosFaciales.append([puntoID,posx,posy])
                     if len(listaPuntosFaciales)==468:
                         objetoAnalisisFacial=AnalisisFacial(listaPuntosFaciales)
-                        objetoAnalisisFacial.getLongitudes()
+                        objetoConexion=Conexion(str(objetoAnalisisFacial.getLongitudes()))
+                        objetoConexion.enviarDatos()           
+                        time.sleep(0.1)      
+                                           
         
-        cv2.imshow("Frame",frame)
+        #cv2.imshow("Frame",frame)
         #Codigo Ascii ESC es 27 para cerrar frame
         if cv2.waitKey(1)==27:
             break

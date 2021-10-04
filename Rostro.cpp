@@ -1,10 +1,15 @@
 #include<GL/glut.h>
+#include<math.h>
+
+#include <iostream>
+#include <fstream>
+#define DEG2RAD 3.14159/180.0
 
 double radio = 2;
 double moZ = 0;
 double movZ = 0;
 
-
+using namespace std;
 void iniciar()
 {
     glClearColor(0.0, 0.0, 0.0, 0.0); //fondo negro
@@ -14,6 +19,24 @@ void iniciar()
     gluLookAt(6, 5, 5, 0, 0, 0, 0, 1, 0);
 
     glMatrixMode(GL_MODELVIEW);
+}
+
+void leerArchivo() {
+    char cadena[128];
+    string datos;
+    try {
+        ifstream fichero("D:/Avatar/Datos/DatosLongitudes.txt");
+
+        while (!fichero.eof()) {
+            fichero >> cadena;
+            datos = datos +" "+ cadena;
+        }
+        fichero.close();
+    }
+    catch (int valor) {
+        cout << "Error codigo: " << valor;
+    }
+    cout << datos << endl;
 }
 
 void tecladoEspecial(int key, int x, int y)
@@ -31,6 +54,7 @@ void tecladoEspecial(int key, int x, int y)
 }
 
 void dibujarPlano() {
+    glColor3f(1, 0, 0);
     glBegin(GL_LINES);
     glVertex3f(5, 0, 0);
     glVertex3f(0, 0, 0);
@@ -47,7 +71,6 @@ void dibujarPlano() {
 }
 
 
-
 void dibujarCabeza() {
     glRotatef(movZ, 0, 0, 0);
     glPushMatrix();
@@ -57,22 +80,67 @@ void dibujarCabeza() {
 
 }
 void dibujarCuello() {
+
     glTranslated(0, 0, 1);
     GLUquadricObj* objetoQ;
     objetoQ = gluNewQuadric();
     gluCylinder(objetoQ, 1, 1, 1.5, 50, 50);
-
+    glTranslated(0, 0, 1.5);
+    gluCylinder(objetoQ, 1, 2, 1, 25, 25);
 }
+
+void dibujarOjos() {
+
+    glLoadIdentity();
+    glColor3f(1, 0, 0);
+    glTranslated(0, 1, 0.5);
+    glRotatef(90, 1, 1, 1);
+    float radioX = 0.7;
+    float radioY = 0.7;
+    glBegin(GL_POLYGON);
+
+    for (int i = 0; i < 360; i++)
+    {
+        float rad = i * DEG2RAD;
+        glVertex2f(cos(rad) * radioX,
+            sin(rad) * radioY);
+    }
+
+    glEnd();
+
+    glLoadIdentity();
+    glColor3f(1, 0, 0);
+    glTranslated(0, 1, -0.5);
+    glRotatef(120, 1, 1, 1);
+    radioX = 0.7;
+    radioY = 0.7;
+    glBegin(GL_POLYGON);
+
+    for (int i = 0; i < 360; i++)
+    {
+        float rad = i * DEG2RAD;
+        glVertex2f(cos(rad) * radioX,
+            sin(rad) * radioY);
+    }
+
+    glEnd();
+}
+
 
 void dibujar()
 {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glLoadIdentity();
-    glRotatef(90, 1, 0, 0);
-    dibujarPlano();
-    dibujarCabeza();
-    dibujarCuello();
-    glFlush();
+    while (true) {
+        leerArchivo();
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glLoadIdentity();
+        glRotatef(90, 1, 0, 0);
+        dibujarPlano();
+        dibujarCabeza();
+        dibujarCuello();
+        //dibujarOjos();
+
+        glFlush();
+    }
 }
 
 void luces() {
