@@ -15,7 +15,8 @@ class MallaFacial:
         #Creamos un objeto donde almacenar los puntos faciales de mediapipe
         mediapDibujoPuntos=mp.solutions.drawing_utils
         #Asignamos valores a los puntos 
-        puntosMalla=mediapDibujoPuntos.DrawingSpec(thickness=1,circle_radius=1,color=(0,255,255))
+        #Color BGR
+        puntosMalla=mediapDibujoPuntos.DrawingSpec(thickness=1,circle_radius=0,color=(255,255,0))
         self.puntosMallaFacial=mediapDibujoPuntos,puntosMalla
 
     def getMallaFacial(self):      

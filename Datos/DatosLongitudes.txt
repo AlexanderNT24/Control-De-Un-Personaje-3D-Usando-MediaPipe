@@ -1,1 +1,7 @@
-[3.0, 17.26267650163207, 17.0]
+boca_cerrada
+ojoI_abierto
+ojoD_abierto
+cejaI_normal
+cejaD_normal
+emocion_neutro
+rotacion_nula
